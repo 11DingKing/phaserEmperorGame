@@ -48,6 +48,11 @@ class PreloadScene extends Phaser.Scene {
         g.generateTexture('btnRed', 220, 55);
 
         g.clear();
+        g.fillStyle(0x2d5a8a, 1);
+        g.fillRoundedRect(0, 0, 120, 45, 10);
+        g.generateTexture('btnBlue', 120, 45);
+
+        g.clear();
         g.fillStyle(0x000000, 0.75);
         g.fillRoundedRect(0, 0, 650, 230, 14);
         g.generateTexture('dialogBg', 650, 230);
