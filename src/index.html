@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基于 Phaser.js 的 Web端皇帝模拟器</title>
+    <!-- 推荐使用最新版的 Phaser3 线上 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container"></div>
+    
+    <!-- 游戏事件/逻辑配置 -->
+    <script src="js/EventSystem.js"></script>
+
+    <!-- 游戏数据基础 -->
+    <script src="js/GameApp.js"></script>
+
+    <!-- 游戏场景 -->
+    <script src="js/scenes/PreloadScene.js"></script>
+    <script src="js/scenes/MenuScene.js"></script>
+    <script src="js/scenes/CourtScene.js"></script>
+    <script src="js/scenes/HaremScene.js"></script>
+    <script src="js/scenes/WarfareScene.js"></script>
+    <script src="js/scenes/HUDScene.js"></script>
+    <script src="js/scenes/GameOverScene.js"></script>
+
+    <!-- 设置游戏入口 -->
+    <script src="js/main.js"></script>
+</body>
+</html>

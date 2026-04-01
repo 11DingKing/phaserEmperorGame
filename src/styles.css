@@ -1,0 +1,18 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#game-container {
+    width: 800px;
+    height: 600px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    /* Prevent text selection */
+    user-select: none;
+}
