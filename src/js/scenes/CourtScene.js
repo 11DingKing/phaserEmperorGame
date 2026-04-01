@@ -50,8 +50,11 @@ class CourtScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // 按钮
-        this.makeBtn(260, 465, '✅  准奏', 'btnGreen', () => this.applyEffects(this.currentEvent.effects, '准奏，退朝！'));
-        this.makeBtn(540, 465, '❌  驳回', 'btnRed', () => this.applyEffects(this.currentEvent.rejectEffects, '驳回，退朝！'));
+        this.makeBtn(260, 465, '✅  准奏', 'btnGreen', () => this.applyEffects(this.currentEvent.effects, '准奏，退朝！', '准奏'));
+        this.makeBtn(540, 465, '❌  驳回', 'btnRed', () => this.applyEffects(this.currentEvent.rejectEffects, '驳回，退朝！', '驳回'));
+
+        // 历史奏折按钮
+        this.makeBtn(680, 80, '📜 历史', 'btnGreen', () => this.showHistoryPopup());
 
         // 退朝
         this.add.text(400, 555, '[ 不作处理，退朝 ]', {
@@ -60,6 +63,87 @@ class CourtScene extends Phaser.Scene {
             .on('pointerover', function () { this.setStyle({ fill: '#fff' }); })
             .on('pointerout', function () { this.setStyle({ fill: '#cccccc' }); })
             .on('pointerdown', () => this.scene.start('MenuScene'));
+    }
+
+    showHistoryPopup() {
+        const history = EventSystem.getHistory();
+        
+        // 创建弹出窗口容器（包含所有元素）
+        const popupContainer = this.add.container(0, 0);
+        
+        // 创建弹出窗口背景
+        const popupBg = this.add.rectangle(400, 300, 560, 460, 0x1a1a1a, 1);
+        const popupBorder = this.add.rectangle(400, 300, 560, 460).setStrokeStyle(4, 0xFFD700);
+        
+        // 标题栏背景
+        const titleBarBg = this.add.rectangle(400, 100, 560, 60, 0x2a2a2a);
+        
+        // 标题
+        const title = this.add.text(400, 100, '【 历史奏折 】', {
+            font: 'bold 24px serif', fill: '#FFD700'
+        }).setOrigin(0.5);
+        
+        // 创建滚动列表区域
+        const listBg = this.add.rectangle(400, 320, 540, 350, 0x1a1a1a);
+        
+        // 创建滚动容器
+        const scrollContainer = this.add.container(130, 135);
+        const scrollMask = this.make.graphics().fillRect(130, 135, 540, 350).createGeometryMask();
+        scrollContainer.setMask(scrollMask);
+        
+        let yPos = 0;
+        const itemHeight = 90;
+        
+        if (history.length === 0) {
+            scrollContainer.add(this.add.text(400 - 130, 150, '暂无历史记录', {
+                font: '18px Arial', fill: '#888'
+            }).setOrigin(0.5));
+        } else {
+            [...history].reverse().forEach((item, index) => {
+                const itemBg = this.add.rectangle(270, yPos + itemHeight / 2, 520, 85, 0x2a2a2a);
+                const decisionColor = item.decision === '准奏' ? '#aaffaa' : '#ffaaaa';
+                const titleText = this.add.text(20, yPos + 10, item.fullText, {
+                    font: '14px Arial', fill: '#fff',
+                    wordWrap: { width: 490 }
+                });
+                const decisionText = this.add.text(20, yPos + 55, '决策: ' + item.decision, {
+                    font: 'bold 16px Arial', fill: decisionColor
+                });
+                const effectsText = this.add.text(20, yPos + 75, '效果: ' + this.formatEffects(item.effects), {
+                    font: '14px Arial', fill: '#ffffaa'
+                });
+                
+                scrollContainer.add([itemBg, titleText, decisionText, effectsText]);
+                yPos += itemHeight;
+            });
+        }
+        
+        // 滚动功能
+        const maxScroll = Math.max(0, yPos - 350);
+        let currentScroll = 0;
+        
+        this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY) => {
+            if (maxScroll > 0) {
+                currentScroll = Phaser.Math.Clamp(currentScroll + deltaY, 0, maxScroll);
+                scrollContainer.y = 135 - currentScroll;
+            }
+        });
+        
+        // 关闭按钮（在标题栏内）
+        const closeBtn = this.add.image(640, 100, 'btnRed').setInteractive();
+        this.add.text(640, 100, '✕', { font: 'bold 24px Arial', fill: '#fff' }).setOrigin(0.5);
+        
+        // 将所有元素添加到容器中，便于管理
+        popupContainer.add([popupBg, popupBorder, titleBarBg, title, listBg, scrollContainer, closeBtn]);
+        
+        const closePopup = () => {
+            popupContainer.destroy();
+            this.input.off('wheel');
+        };
+        
+        closeBtn.on('pointerdown', closePopup);
+        closeBtn.on('pointerover', () => closeBtn.setAlpha(0.8));
+        closeBtn.on('pointerout', () => closeBtn.setAlpha(1.0));
     }
 
     formatEffects(fx) {
@@ -78,8 +162,12 @@ class CourtScene extends Phaser.Scene {
         btn.on('pointerdown', cb);
     }
 
-    applyEffects(effects, msg) {
+    applyEffects(effects, msg, decision) {
         if (!effects) { this.scene.start('MenuScene'); return; }
+        
+        // 记录历史
+        EventSystem.addHistory(this.currentEvent, decision, effects);
+        
         if (effects.treasury) window.GameData.treasury += effects.treasury;
         if (effects.publicSentiment) window.GameData.publicSentiment += effects.publicSentiment;
         if (effects.militaryPower) window.GameData.militaryPower += effects.militaryPower;
