@@ -16,6 +16,11 @@ class GameAppData {
             queen: 30, // 皇后
             consort: 10 // 贵妃
         };
+
+        // 清空历史奏折记录
+        if (typeof EventSystem !== 'undefined') {
+            EventSystem.clearHistory();
+        }
     }
 
     nextMonth() {

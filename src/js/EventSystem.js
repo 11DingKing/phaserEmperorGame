@@ -1,4 +1,28 @@
 const EventSystem = {
+    // 历史奏折记录
+    petitionHistory: [],
+
+    // 添加奏折到历史记录
+    addToHistory(petition, decision, effects) {
+        this.petitionHistory.push({
+            id: this.petitionHistory.length + 1,
+            title: petition.text,
+            decision: decision,
+            effects: effects,
+            timestamp: `第 ${window.GameData ? window.GameData.month : 1} 月`
+        });
+    },
+
+    // 获取所有历史奏折
+    getHistory() {
+        return this.petitionHistory;
+    },
+
+    // 清空历史记录（新游戏时调用）
+    clearHistory() {
+        this.petitionHistory = [];
+    },
+
     // 随机事件表：格式如奏章
     petitions: [
         {

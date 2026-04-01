@@ -52,6 +52,7 @@ class GameOverScene extends Phaser.Scene {
         btnBg.on('pointerout', () => { btnBg.clear(); btnBg.fillStyle(0x660000, 0.9).fillRoundedRect(270, 525, 260, 55, 12); });
         btnBg.on('pointerdown', () => {
             window.GameData.reset();
+            EventSystem.clearHistory();
             this.scene.stop('HUDScene');
             this.cameras.main.fade(400, 0, 0, 0, false, (cam, t) => {
                 if (t === 1) {
